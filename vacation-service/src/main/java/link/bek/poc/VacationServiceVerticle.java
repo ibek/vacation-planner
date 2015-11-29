@@ -24,7 +24,7 @@ public class VacationServiceVerticle extends AbstractVerticle {
     public void start(Future<Void> future) {
         JsonObject config = config();
         int port = config.getInteger("http.port", 8080);
-        int mongoPort = config.getInteger("mongo.port", 8889);
+        int mongoPort = config.getInteger("mongo.port", 27017);
         
         vacationManager = new VacationManager(MongoClient.createShared(vertx, mongoConfig(mongoPort)));
         vacationAPI = new VacationAPI(vacationManager);

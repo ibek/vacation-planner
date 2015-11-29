@@ -55,7 +55,7 @@ public class VacationAPI {
                 context.fail(result.cause());
                 return;
             }
-            JsonArray response = new JsonArray((List)result);
+            JsonArray response = new JsonArray((List)result.result());
             context.response().end(response.encode());
         });
     }
@@ -73,7 +73,7 @@ public class VacationAPI {
                 context.fail(result.cause());
                 return;
             }
-            JsonArray response = new JsonArray((List)result);
+            JsonArray response = new JsonArray((List)result.result());
             context.response().end(response.encode());
         });
     }
