@@ -23,6 +23,7 @@ public class VacationAPI {
                 context.fail(result.cause());
                 return;
             }
+            vacationManager.transformDates(vacation);
             context.response().end(vacation.toString());
         });
     }
@@ -39,7 +40,9 @@ public class VacationAPI {
                 context.fail(result.cause());
                 return;
             }
-            context.response().end(result.result().encode());
+            JsonObject vacation = result.result();
+            vacation = vacationManager.transformDates(vacation);
+            context.response().end(vacation.encode());
         });
     }
     
@@ -55,7 +58,11 @@ public class VacationAPI {
                 context.fail(result.cause());
                 return;
             }
-            JsonArray response = new JsonArray((List)result.result());
+            List<JsonObject> vacations = result.result();
+            for (JsonObject vacation : vacations) {
+                vacationManager.transformDates(vacation);
+            }
+            JsonArray response = new JsonArray((List)vacations);
             context.response().end(response.encode());
         });
     }

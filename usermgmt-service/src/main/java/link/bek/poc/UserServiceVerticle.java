@@ -11,14 +11,14 @@ import io.vertx.ext.mongo.MongoClient;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.handler.BodyHandler;
 import io.vertx.ext.web.handler.ErrorHandler;
-import link.bek.poc.api.VacationAPI;
-import link.bek.poc.dao.VacationManager;
+import link.bek.poc.api.UserAPI;
+import link.bek.poc.dao.UserManager;
 
-public class VacationServiceVerticle extends AbstractVerticle {
+public class UserServiceVerticle extends AbstractVerticle {
     
     private HttpServer server;
-    private VacationManager vacationManager;
-    private VacationAPI vacationAPI;
+    private UserManager userManager;
+    private UserAPI userAPI;
 
     @Override
     public void start(Future<Void> future) {
@@ -32,8 +32,9 @@ public class VacationServiceVerticle extends AbstractVerticle {
         if (mongoPort == null) {
             mongoPort = "27017";
         }
-        vacationManager = new VacationManager(MongoClient.createShared(vertx, mongoConfig(mongoHost, Integer.valueOf(mongoPort))));
-        vacationAPI = new VacationAPI(vacationManager);
+        
+        userManager = new UserManager(MongoClient.createShared(vertx, mongoConfig(mongoHost, Integer.valueOf(mongoPort))));
+        userAPI = new UserAPI(userManager);
         server = vertx.createHttpServer(createOptions(port));
         server.requestHandler(createRouter()::accept);
         server.listen(result -> {
@@ -88,10 +89,9 @@ public class VacationServiceVerticle extends AbstractVerticle {
         });
 
         /* API to deal with feeds : token required */
-        router.post("/vacations").handler(vacationAPI::create);
-        router.get("/vacations/:vacationId").handler(vacationAPI::retrieveById);
-        router.get("/employees/:employee/vacations").handler(vacationAPI::retrieveByEmployee);
-        router.get("/vacations").handler(vacationAPI::retrieveByDuration);
+        router.post("/users").handler(userAPI::create);
+        router.get("/users/:userId").handler(userAPI::retrieveById);
+        router.get("/users").handler(userAPI::retrieveByManager);
 
         return router;
     }
