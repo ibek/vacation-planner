@@ -4,7 +4,6 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import io.vertx.core.AsyncResult;
@@ -60,18 +59,17 @@ public class VacationManager {
         query.put("$or", new JsonArray(orDuration));
         mongo.find(COLLECTION, query, handler);
     }
-    
-    public JsonObject transformDates(JsonObject vacation) {
-        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-        Long from = vacation.getLong("from");
-        vacation.put("from", dateFormat.format(new Date(from)));
-        Long to = vacation.getLong("to");
-        vacation.put("to", dateFormat.format(new Date(to)));
-        return vacation;
+
+    public void updateVacation(JsonObject vacation, Handler<AsyncResult<Void>> handler) {
+        JsonObject query = new JsonObject().put("_id", vacation.getString("_id"));
+        mongo.replace(COLLECTION, query, vacation, handler);
     }
     
     private boolean checkVacation(JsonObject vacation) {
         String[] elements = {"employee", "description", "from", "to", "approver", "status"};
+        if (vacation.containsKey("_id")) {
+            vacation.remove("_id");
+        }
         if (vacation.size() != elements.length) {
             return false;
         }
@@ -80,23 +78,6 @@ public class VacationManager {
                 return false;
             }
         }
-        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-
-        String from = vacation.getString("from");
-        try {
-			Date fromDate = dateFormat.parse(from);
-			vacation.put("from", fromDate.getTime());
-		} catch (ParseException e) {
-			return false;
-		}
-        
-        String to = vacation.getString("to");
-        try {
-			Date toDate = dateFormat.parse(to);
-			vacation.put("to", toDate.getTime());
-		} catch (ParseException e) {
-			return false;
-		}
         return true;
     }
 }

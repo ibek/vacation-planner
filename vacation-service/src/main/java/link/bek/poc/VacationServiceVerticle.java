@@ -89,6 +89,7 @@ public class VacationServiceVerticle extends AbstractVerticle {
 
         /* API to deal with feeds : token required */
         router.post("/vacations").handler(vacationAPI::create);
+        router.post("/vacations/:vacationId").handler(vacationAPI::updateStatus);
         router.get("/vacations/:vacationId").handler(vacationAPI::retrieveById);
         router.get("/employees/:employee/vacations").handler(vacationAPI::retrieveByEmployee);
         router.get("/vacations").handler(vacationAPI::retrieveByDuration);

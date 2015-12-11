@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <modelVersion>4.0.0</modelVersion>
+  
+  <groupId>link.bek.poc</groupId>
+  <artifactId>vacation-process</artifactId>
+  <version>1.0-SNAPSHOT</version>
+  <name>vacation-process</name>
+  
+  <properties>
+    <kie.version>6.4.0-SNAPSHOT</kie.version>
+  </properties>
+  
+  <dependencies>
+    <dependency>
+	  <groupId>org.kie</groupId>
+	  <artifactId>kie-api</artifactId>
+	  <version>${kie.version}</version>
+	  <scope>provided</scope>
+    </dependency>
+  </dependencies>
+  
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.kie</groupId>
+        <artifactId>kie-maven-plugin</artifactId>
+        <version>6.3.0.Final</version>
+        <extensions>true</extensions>
+      </plugin>
+      
+      <plugin>
+        <groupId>com.spotify</groupId>
+        <artifactId>docker-maven-plugin</artifactId>
+        <version>0.2.8</version>
+        <executions>
+          <execution>
+            <id>docker</id>
+            <phase>package</phase>
+            <goals>
+              <goal>build</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <dockerDirectory>${project.basedir}/src/main/docker</dockerDirectory>
+          <imageName>ibek/vacation-process</imageName>
+          <resources>
+            <resource>
+              <targetPath>/</targetPath>
+              <directory>${project.build.directory}</directory>
+              <includes>
+                <include>${project.artifactId}-${project.version}.jar</include>
+              </includes>
+            </resource>
+            <resource>
+              <targetPath>/</targetPath>
+              <directory>${project.build.directory}</directory>
+              <includes>
+                <include>classes/config/*.*</include>
+              </includes>
+            </resource>
+          </resources>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+</project>

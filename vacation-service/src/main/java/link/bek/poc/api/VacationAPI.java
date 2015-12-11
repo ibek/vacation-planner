@@ -23,7 +23,6 @@ public class VacationAPI {
                 context.fail(result.cause());
                 return;
             }
-            vacationManager.transformDates(vacation);
             context.response().end(vacation.toString());
         });
     }
@@ -41,7 +40,6 @@ public class VacationAPI {
                 return;
             }
             JsonObject vacation = result.result();
-            vacation = vacationManager.transformDates(vacation);
             context.response().end(vacation.encode());
         });
     }
@@ -59,9 +57,6 @@ public class VacationAPI {
                 return;
             }
             List<JsonObject> vacations = result.result();
-            for (JsonObject vacation : vacations) {
-                vacationManager.transformDates(vacation);
-            }
             JsonArray response = new JsonArray((List)vacations);
             context.response().end(response.encode());
         });
@@ -83,6 +78,32 @@ public class VacationAPI {
             JsonArray response = new JsonArray((List)result.result());
             context.response().end(response.encode());
         });
+    }
+    
+    public void updateStatus(RoutingContext context) {
+        String status = context.getBodyAsString();
+        HttpServerRequest request = context.request();
+        String vacationId = request.getParam("vacationId");
+        if (vacationId == null) {
+            context.fail(400);
+            return;
+        }
+        vacationManager.vacationById(vacationId, result -> {
+            if (result.failed()) {
+                context.fail(result.cause());
+                return;
+            }
+            JsonObject vacation = result.result();
+            vacation.put("status", status);
+            vacationManager.updateVacation(vacation, result2 -> {
+                if (result2.failed()) {
+                    context.fail(result2.cause());
+                    return;
+                }
+                context.response().end();
+            });
+        });
+        
     }
     
 }

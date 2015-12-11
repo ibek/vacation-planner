@@ -7,7 +7,8 @@ MAINTAINER "Ivo Bek" "ibek@redhat.com"
 ####### ENVIRONMENT ############
 ENV JAVA_OPTS -XX:MaxPermSize=256m -Xms256m -Xmx512m
 ENV JBOSS_BIND_ADDRESS 0.0.0.0
-ENV KIE_SERVER_VERSION 6.3.0.Final
+ENV KIE_SERVER_VERSION 6.4.0-SNAPSHOT
+ENV KJAR vacation-process-1.0-SNAPSHOT.jar
 LABEL org.kie.kie-server.artifact=org.kie.server:kie-server:war:webc
 EXPOSE 8080
 
@@ -20,22 +21,34 @@ echo "jboss:jboss" | chpasswd
 ####### KIE-SERVER & WILDFLY8 CONFIG FILES ############
 # Latest WAR from Maven repository & Custom Wildfly configuration files
 
-# Wildfly custom configuration.
-ADD config/kie-server-users.properties $JBOSS_HOME/standalone/configuration/kie-server-users.properties
-ADD config/kie-server-roles.properties $JBOSS_HOME/standalone/configuration/kie-server-roles.properties
-ADD config/standalone-full-kie-server.xml $JBOSS_HOME/standalone/configuration/standalone-full-kie-server.xml
+# KIE Server custom configuration.
+ADD classes/config/kie-server-users.properties $JBOSS_HOME/standalone/configuration/kie-server-users.properties
+ADD classes/config/kie-server-roles.properties $JBOSS_HOME/standalone/configuration/kie-server-roles.properties
+ADD classes/config/standalone-full-kie-server.xml $JBOSS_HOME/standalone/configuration/standalone-full-kie-server.xml
+ADD classes/config/vacation-planner-server.xml $JBOSS_HOME/bin/vacation-planner-server.xml
+ADD classes/config/settings.xml $JBOSS_HOME/bin/settings.xml
 
 # Custom kie-server Wildfly startup scripts.
-ADD config/start_kie-server.sh $JBOSS_HOME/bin/start_kie-server.sh
+ADD classes/config/start_kie-server.sh $JBOSS_HOME/bin/start_kie-server.sh
+
+# Add KJAR
+ADD ${KJAR} /${KJAR}
 
 # Add the kie-server WAR artifact from the Maven repository.
 RUN yum -y install wget
-RUN wget https://repository.jboss.org/nexus/service/local/repositories/central/content/org/kie/server/kie-server/${KIE_SERVER_VERSION}/kie-server-${KIE_SERVER_VERSION}-ee7.war -O $JBOSS_HOME/standalone/deployments/kie-server-archive.war
+
+# RUN wget https://repository.jboss.org/nexus/service/local/repositories/central/content/org/kie/server/kie-server/${KIE_SERVER_VERSION}/kie-server-${KIE_SERVER_VERSION}-ee7.war -O $JBOSS_HOME/standalone/deployments/kie-server-archive.war
+
+RUN wget https://repository.jboss.org/nexus/service/local/repositories/snapshots/content/org/kie/server/kie-server/6.4.0-SNAPSHOT/kie-server-6.4.0-20151210.222755-513-ee7.war -O $JBOSS_HOME/standalone/deployments/kie-server-archive.war
 
 # Work with unpacked WAR archives in WildFly, so other images can override webapp files (such as persistence.xml,etc)
 RUN unzip -q -d $JBOSS_HOME/standalone/deployments/kie-server.war $JBOSS_HOME/standalone/deployments/kie-server-archive.war && \
 touch $JBOSS_HOME/standalone/deployments/kie-server.war.dodeploy && \
 rm -rf $JBOSS_HOME/standalone/deployments/kie-server-archive.war
+
+# Deploy KJAR
+RUN yum -y install maven
+RUN mvn install:install-file -Dfile=/${KJAR} -DlocalRepositoryPath=$JBOSS_HOME/bin/repositories/kie -DgroupId=link.bek.poc -DartifactId=vacation-process -Dpackaging=jar -Dversion=1.0-SNAPSHOT
 
 # Set right permissions for jboss user.
 RUN chown -R jboss:jboss $JBOSS_HOME/standalone/deployments/* && \
@@ -44,7 +57,10 @@ chown jboss:jboss $JBOSS_HOME/bin/start_kie-server.sh && \
 chown jboss:jboss $JBOSS_HOME/standalone/configuration/kie-server-users.properties && \ 
 chown jboss:jboss $JBOSS_HOME/standalone/configuration/kie-server-roles.properties && \
 chown jboss:jboss $JBOSS_HOME/standalone/configuration/standalone-full-kie-server.xml && \
-chown -R jboss:jboss $JBOSS_HOME/modules/system/layers/base/*
+chown jboss:jboss $JBOSS_HOME/bin/vacation-planner-server.xml && \
+chown jboss:jboss $JBOSS_HOME/bin/settings.xml && \
+chown -R jboss:jboss $JBOSS_HOME/modules/system/layers/base/* && \
+chown -R jboss:jboss $JBOSS_HOME/bin/repositories/kie/*
 
 # Switchback to jboss user
 USER jboss

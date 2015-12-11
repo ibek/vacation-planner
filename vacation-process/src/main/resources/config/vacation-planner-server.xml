@@ -1,0 +1,23 @@
+<kie-server-state>
+  <controllers/>
+  <configuration>
+    <configItems>
+      <config-item>
+        <name>org.kie.server.id</name>
+        <value>vacation-planner-server</value>
+        <type>java.lang.String</type>
+      </config-item>
+    </configItems>
+  </configuration>
+  <containers>
+    <container>
+      <containerId>vacation-planner</containerId>
+      <releaseId>
+        <groupId>link.bek.poc</groupId>
+        <artifactId>vacation-process</artifactId>
+        <version>1.0-SNAPSHOT</version>
+      </releaseId>
+      <status>STARTED</status>
+    </container>
+  </containers>
+</kie-server-state>
