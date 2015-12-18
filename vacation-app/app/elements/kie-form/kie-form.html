@@ -1,0 +1,174 @@
+<!--
+@license
+Copyright (c) 2015 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+
+<dom-module id="kie-form">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+      #formPost {
+        padding: 10px;
+      }
+      .form {
+        background-color: white;
+        padding: 20px;
+        margin-top: 10px;
+      }
+      .list-items {
+        margin: 10px;
+      }
+      .list-title {
+        margin-bottom: 10px;
+        font-weight: bold;
+      }
+    </style>
+    <div style="font-size:30px">[[formData.name]]</div>
+    <div class="list-items">
+      <template is="dom-repeat" items="{{fields}}" as="field" sort="_sortFields">
+        <template is="dom-if" if="{{_isInputText(field)}}">
+          <paper-input label="[[field.label]]" value="{{field.inputBinding}}"></paper-input>
+        </template>
+        <template is="dom-if" if="{{_isInputDate(field)}}">
+          <paper-input type="date" label="[[field.label]]" value="{{field.inputBinding}}"></paper-input>
+        </template>
+      </template>
+    </div>
+    <paper-button raised on-click="_submitForm">[[buttonName]]</paper-button>
+    <iron-ajax
+      verbose
+      id="ajax"
+      url="[[url]]"
+      method="POST"
+      headers="[[headers]]"
+      content-type="application/json"
+      handle-as="json"
+      on-response="_handleResponse">
+    </iron-ajax>
+    <paper-toast id="notification" text="[[notificationMessage]]"></paper-toast>
+  </template>
+
+  <script>
+    (function () {
+      Polymer({
+        is: 'kie-form',
+        properties: {
+          url: {
+            type: String
+          },
+          formData: {
+            type: Object,
+            observer: "_readData"
+          },
+          buttonName: {
+            type: String,
+            value: "Submit"
+          },
+          fields: {
+            type: Array
+          },
+          notificationMessage: {
+            type: String
+          },
+          headers: {
+            type: Object,
+            value: {}
+          },
+          user: {
+            type: Object
+          }
+        },
+
+        ready: function() {
+
+        },
+
+        _readData: function() {
+          this.fields = this.formData.field;
+        },
+
+        _submitForm: function () {
+          this.$.ajax.body = this._makePayload();
+          this.headers.Accept = "application/json";
+          if (this.user != null) {
+            this.headers.Authorization = "Basic " + btoa(this.user.userId + ":" + this.user.password);
+          }
+          this.headers["X-Requested-With"] = "XMLHttpRequest";
+          this.notificationMessage = "The form '" + this.formData.name + "' is being submited.";
+          this.$.notification.open();
+          this.$.ajax.generateRequest();
+        },
+
+        _sortFields: function(a, b) {
+          return a.position - b.position;
+        },
+
+        _isInputText: function(field) {
+          return field.type == "InputText";
+        },
+
+        _isInputDate: function(field) {
+          return field.type == "InputDate";
+        },
+
+        _makePayload: function() {
+          var out = {};
+          for (i = 0; i < this.fields.length; i++) {
+            field = this.fields[i];
+            console.log(i);
+            var propName;
+            var propSubName;
+            var value = field.inputBinding;
+            if (this._isInputDate(field)) {
+              var parts = value.split('-');
+              value = new Date(parts[0], parts[1]-1, parts[2]).getTime();
+            }
+            index = field.outputBinding.indexOf("/");
+            if (index > -1) {
+              propName = field.outputBinding.substring(0,index);
+              propSubName = field.outputBinding.substring(index+1,field.outputBinding.length);
+              classType = this._getDataHolderFor(propName).value;
+              if (out[propName] == null) {
+                  out[propName] = {};
+                  out[propName][classType] = {};
+              }
+              console.log(propName + " " + classType + " " + propSubName + " = " + value);
+              out[propName][classType][propSubName] = value;
+            } else {
+              propName = field.outputBinding;
+              out[propName] = value;
+            }
+          }
+          console.log(out);
+          return out;
+        },
+
+        _getDataHolderFor: function(outId) {
+          for (j = 0; j < this.formData.dataHolder.length; j++) {
+            dataHolder = this.formData.dataHolder[j];
+            if (dataHolder.outId == outId) {
+              return dataHolder;
+            }
+          }
+        },
+
+        _handleResponse: function(response) {
+          this.response = response.detail.response;
+          console.log(this.response);
+          this.notificationMessage = "The form '" + this.formData.name + "' has been accepted succesfully.";
+          this.$.notification.open();
+        }
+
+      });
+    })();
+  </script>
+
+</dom-module>

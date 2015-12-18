@@ -25,6 +25,11 @@ public class UserManager {
         mongo.insert(COLLECTION, user, handler);
     }
     
+    public void allUsers(Handler<AsyncResult<List<JsonObject>>> handler) {
+        JsonObject query = new JsonObject();
+        mongo.find(COLLECTION, query, handler);
+    }
+    
     public void userById(String userId, Handler<AsyncResult<JsonObject>> handler) {
         JsonObject query = new JsonObject();
         query.put("userId", userId);
@@ -38,7 +43,7 @@ public class UserManager {
     }
     
     private boolean checkUser(JsonObject user) {
-        String[] elements = {"userId", "name", "manager"};
+        String[] elements = {"userId", "name", "manager", "password"};
         if (user.size() != elements.length) {
             return false;
         }

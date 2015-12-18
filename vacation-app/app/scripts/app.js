@@ -71,4 +71,17 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     document.getElementById('mainContainer').scrollTop = 0;
   };
 
+  app.isManager = function(user) {
+    return user != null && user.manager == null;
+  };
+
+  app.checkRoute = function(a, b) {
+    return a == b && this.selectedUser != null;
+  };
+
+  app.getSelectedUser = function() {
+    console.log(this.selectedUser);
+    return this.selectedUser;
+  };
+
 })(document);

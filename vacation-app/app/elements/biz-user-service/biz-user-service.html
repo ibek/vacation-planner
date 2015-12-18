@@ -1,0 +1,73 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+
+<dom-module id="biz-user-service">
+  <template>
+    <style include="shared-styles"></style>
+    <style>
+      :host {
+        display: block;
+      }
+    </style>
+    <iron-ajax
+      auto
+      url="[[url]]"
+      method="[[method]]"
+      body="[[body]]"
+      content-type="[[contentType]]"
+      params="[[params]]"
+      handle-as="json"
+      on-response="_handleResponse">
+    </iron-ajax>
+  </template>
+
+  <script>
+    (function() {
+      'use strict';
+
+      Polymer({
+        is: 'biz-user-service',
+
+        properties: {
+          url: {
+            type: String
+          },
+          op: {
+            type: String,
+            observer: "_changeUrl"
+          },
+          method: {
+            type: String,
+            value: "GET"
+          },
+          body: {
+            type: String
+          },
+          contentType: {
+            type: String
+          },
+          params: {
+            type: Object
+          },
+          error: {
+            type: Object,
+            notify: true
+          },
+          response: {
+            type: Object,
+            notify: true
+          }
+        },
+
+        _changeUrl: function() {
+          this.url = "http://localhost:8182/api/" + this.op;
+        },
+
+        _handleResponse: function(response) {
+          console.log(response.detail.response);
+          this.response = response.detail.response;
+        }
+      });
+    })();
+  </script>
+
+</dom-module>

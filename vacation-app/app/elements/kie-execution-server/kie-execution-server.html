@@ -1,0 +1,110 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+
+<dom-module id="kie-execution-server">
+  <template>
+    <style include="shared-styles"></style>
+    <style>
+      :host {
+        display: block;
+      }
+    </style>
+    <iron-ajax
+      verbose
+      id="ajax"
+      url="[[url]]"
+      method="[[method]]"
+      headers="{{_makeHeaders(username,password)}}"
+      body="[[body]]"
+      content-type="[[contentType]]"
+      params="[[params]]"
+      handle-as="json"
+      on-response="_handleResponse"
+      on-error="_handleError">
+    </iron-ajax>
+  </template>
+
+  <script>
+    (function() {
+      'use strict';
+
+      Polymer({
+        is: 'kie-execution-server',
+
+        properties: {
+          serverUrl: {
+            type: String,
+            value: "http://172.17.42.1:8081/kie-server/services/rest/server/",
+            notify: true,
+            readOnly: true
+          },
+          url: {
+            type: String
+          },
+          op: {
+            type: String,
+            observer: "_changeUrl"
+          },
+          method: {
+            type: String,
+            value: "GET"
+          },
+          body: {
+            type: String
+          },
+          contentType: {
+            type: String
+          },
+          params: {
+            type: Object
+          },
+          username: {
+            type: String,
+            value: "kie-server"
+          },
+          password: {
+            type: String,
+            value: "kie-server"
+          },
+          error: {
+            type: Object,
+            notify: true
+          },
+          response: {
+            type: Object,
+            notify: true
+          }
+        },
+
+        ready: function() {
+
+        },
+
+        execute: function() {
+          this.$.ajax.generateRequest();
+        },
+
+        _changeUrl: function() {
+          this.url = this.serverUrl + this.op;
+        },
+
+        _makeHeaders: function(user, pass){
+          var obj = {};
+          obj.Accept = "application/json";
+          obj.Authorization = "Basic " + btoa(user + ":" + pass);
+          obj["X-Requested-With"] = "XMLHttpRequest";
+          return obj;
+        },
+
+        _handleResponse: function(response) {
+          this.response = response.detail.response;
+          console.log(this.response);
+        },
+
+        _handleError: function(error) {
+          console.log(error);
+        }
+      });
+    })();
+  </script>
+
+</dom-module>

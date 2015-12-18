@@ -85,6 +85,7 @@ public class UserServiceVerticle extends AbstractVerticle {
         router.route().handler(BodyHandler.create());
         router.route().handler(context -> {
             context.response().headers().add(CONTENT_TYPE, "application/json");
+            context.response().headers().add("Access-Control-Allow-Origin", "*");
             context.next();
         });
 

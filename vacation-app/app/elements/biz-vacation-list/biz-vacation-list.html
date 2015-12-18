@@ -9,34 +9,44 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 -->
 <link rel="import" href="../../bower_components/polymer/polymer.html">
 
-<dom-module id="my-greeting">
+<dom-module id="biz-vacation-list">
   <template>
-    <style include="shared-styles"></style>
-    <style>
-      :host {
-        display: block;
-      }
-    </style>
-    <h2 class="page-title"><span>{{greeting}}</span></h2>
-    <span class="paper-font-body2">Update text to change the greeting.</span>
-    <!-- Listens for "input" event and sets greeting to <input>.value -->
-    <input class="paper-font-body2" value="{{greeting::input}}">
+    <kie-process-list
+      user="{{user}}"
+      process-id="vacation-process.RequestVacation"
+      columns="[[columns]]"
+      initiator="[[user.userId]]">
+    </kie-process-list>
   </template>
 
   <script>
-    (function() {
-      'use strict';
-      
+    (function () {
       Polymer({
-        is: 'my-greeting',
-
+        is: 'biz-vacation-list',
         properties: {
-          greeting: {
-            type: String,
-            value: 'Welcome!',
+          user: {
+            type: Object,
+            notify: true,
+            observer: "_configureFilter"
+          },
+          columns: {
+            type: Array,
+            value: ["Description"]
+          },
+          varFilter: {
+            type: Object,
             notify: true
           }
+        },
+
+        ready: function() {
+
+        },
+
+        _configureFilter: function() {
+          this.varFilter = {"userId": this.user.userId};
         }
+
       });
     })();
   </script>

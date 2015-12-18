@@ -22,22 +22,29 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       next();
     }
 
+    function routeForLoggedUser(location) {
+      if (app.selectedUser == null) {
+        app.route = 'home';
+      } else {
+        app.route = location;
+      }
+    }
+
     // Routes
     page('/', scrollToTop, function() {
       app.route = 'home';
     });
+    page('/newvacation', scrollToTop, function() {
+      routeForLoggedUser('newvacation');
+    });
 
-    page('/users', scrollToTop, function() {
-      app.route = 'users';
+    page('/myrequests', scrollToTop, function() {
+      routeForLoggedUser('myrequests');
     });
 
     page('/users/:name', scrollToTop, function(data) {
       app.route = 'user-info';
       app.params = data.params;
-    });
-
-    page('/contact', scrollToTop, function() {
-      app.route = 'contact';
     });
 
     // add #! before urls

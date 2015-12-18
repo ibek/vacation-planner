@@ -27,6 +27,18 @@ public class UserAPI {
         });
     }
     
+    public void retrieveAll(RoutingContext context) {
+        userManager.allUsers(result -> {
+            if (result.failed()) {
+                context.fail(result.cause());
+                return;
+            }
+            List<JsonObject> users = result.result();
+            JsonArray response = new JsonArray((List)users);
+            context.response().end(response.encode());
+        });
+    }
+    
     public void retrieveById(RoutingContext context) {
         HttpServerRequest request = context.request();
         String userId = request.getParam("userId");
@@ -48,7 +60,7 @@ public class UserAPI {
         HttpServerRequest request = context.request();
         String manager = request.getParam("manager");
         if (manager == null) {
-            context.fail(400);
+            retrieveAll(context);
             return;
         }
         userManager.usersByManager(manager, result -> {

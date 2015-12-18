@@ -46,6 +46,8 @@ RUN unzip -q -d $JBOSS_HOME/standalone/deployments/kie-server.war $JBOSS_HOME/st
 touch $JBOSS_HOME/standalone/deployments/kie-server.war.dodeploy && \
 rm -rf $JBOSS_HOME/standalone/deployments/kie-server-archive.war
 
+ADD classes/config/web.xml $JBOSS_HOME/standalone/deployments/kie-server.war/WEB-INF/web.xml
+
 # Deploy KJAR
 RUN yum -y install maven
 RUN mvn install:install-file -Dfile=/${KJAR} -DlocalRepositoryPath=$JBOSS_HOME/bin/repositories/kie -DgroupId=link.bek.poc -DartifactId=vacation-process -Dpackaging=jar -Dversion=1.0-SNAPSHOT

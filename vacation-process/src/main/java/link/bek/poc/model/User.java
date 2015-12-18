@@ -16,6 +16,8 @@ public class User implements java.io.Serializable
    private java.lang.String name;
    @org.kie.api.definition.type.Label("Manager")
    private java.lang.String manager;
+   @org.kie.api.definition.type.Label("Password")
+   private java.lang.String password;
 
    @org.kie.api.definition.type.Label(value = "Identifier")
    private java.lang.String _id;
@@ -52,6 +54,16 @@ public class User implements java.io.Serializable
    public void setManager(java.lang.String manager)
    {
       this.manager = manager;
+   }
+
+   public java.lang.String getPassword()
+   {
+      return this.password;
+   }
+
+   public void setPassword(java.lang.String password)
+   {
+      this.password = password;
    }
 
    public java.lang.String get_id()
