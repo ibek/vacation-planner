@@ -16,8 +16,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         display: block;
       }
     </style>
-    <kie-execution-server id="kieServer" op="[[getFormUrl]]" response="{{vacationStartForm}}" server-url="{{serverUrl}}"></kie-execution-server>
-    <kie-form user="[[user]]" url="[[startProcessUrl]]" form-data="[[vacationStartForm.form]]" button-name="[[buttonName]]"></kie-form>
+    <kie-execution-server id="kieServer" op="[[getFormUrl]]" response="{{startForm}}" server-url="{{serverUrl}}"></kie-execution-server>
+    <kie-form user="[[user]]" url="[[startProcessUrl]]" form-data="[[startForm.form]]" button-name="[[buttonName]]"></kie-form>
   </template>
 
   <script>
@@ -40,7 +40,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           startProcessUrl: {
             type: String
           },
-          vacationStartForm: {
+          startForm: {
             type: Object
           },
           user: {

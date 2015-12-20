@@ -91,8 +91,18 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
         },
 
-        _readData: function() {
+        resetForm: function() {
           this.fields = this.formData.field;
+          for (j = 0; j < this.fields.length; j++) {
+            var field = this.fields[j];
+            if (this._isInputDate(field) && field.inputBinding == null) {
+              field.inputBinding = new Date().getTime();
+            }
+          }
+        },
+
+        _readData: function() {
+          this.resetForm();
         },
 
         _submitForm: function () {
@@ -163,9 +173,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         _handleResponse: function(response) {
           this.response = response.detail.response;
           console.log(this.response);
-          for (j = 0; j < this.fields.length; j++) {
-            this.set("fields."+j+".inputBinding", null);
-          }
+          this.resetForm();
           this.notificationMessage = "The form '" + this.formData.name + "' has been accepted succesfully.";
           this.$.notification.open();
         }

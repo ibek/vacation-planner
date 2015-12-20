@@ -170,6 +170,11 @@
                   					<span>{{value.description}}</span>
                 				</template>
                       </paper-datatable-column>
+                			<paper-datatable-column header="Duration" type="Object" property="vacation">
+                        <template>
+                  					<span>{{item.vacation.from}} - {{item.vacation.to}}</span>
+                				</template>
+                      </paper-datatable-column>
                 			<paper-datatable-column header="Status" type="Object" property="vacation">
                         <template>
                   					<span>{{value.status}}</span>
