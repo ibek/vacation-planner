@@ -16,6 +16,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       process-id="vacation-process.RequestVacation"
       columns="[[columns]]"
       initiator="[[user.userId]]">
+      <content></content>
     </kie-process-list>
   </template>
 
@@ -31,7 +32,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           },
           columns: {
             type: Array,
-            value: ["Description"]
+            value: null//["Description"]
           },
           varFilter: {
             type: Object,

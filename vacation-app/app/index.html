@@ -160,8 +160,21 @@
               <section data-route="myrequests">
                 <template is="dom-if" if="{{checkRoute(route, 'myrequests')}}">
                   <paper-material elevation="1">
+                    <div style="font-size:30px">My Vacation Requests</div>
                     <biz-vacation-list
                       user="{{selectedUser}}">
+                      <paper-datatable-column header="Id" property="process-instance-id" sortable></paper-datatable-column>
+                			<paper-datatable-column type="date" header="Requested in" property="start-date" sortable></paper-datatable-column>
+                			<paper-datatable-column header="Description" type="Object" property="vacation">
+                        <template>
+                  					<span>{{value.description}}</span>
+                				</template>
+                      </paper-datatable-column>
+                			<paper-datatable-column header="Status" type="Object" property="vacation">
+                        <template>
+                  					<span>{{value.status}}</span>
+                				</template>
+                      </paper-datatable-column>
                     </biz-vacation-list>
                   </paper-material>
                 </template>

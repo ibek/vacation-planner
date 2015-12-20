@@ -33,7 +33,7 @@
         properties: {
           serverUrl: {
             type: String,
-            value: "http://172.17.42.1:8081/kie-server/services/rest/server/",
+            value: "http://localhost:8081/kie-server/services/rest/server/",
             notify: true,
             readOnly: true
           },
@@ -72,6 +72,12 @@
           response: {
             type: Object,
             notify: true
+          },
+          _boundHandleResponse: {
+            type: Function,
+            value: function() {
+              return this._handleResponse.bind(this);
+            }
           }
         },
 
@@ -97,7 +103,7 @@
 
         _handleResponse: function(response) {
           this.response = response.detail.response;
-          console.log(this.response);
+          this.fire('response', this.response, {bubbles: false});
         },
 
         _handleError: function(error) {

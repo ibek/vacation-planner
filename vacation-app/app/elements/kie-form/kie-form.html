@@ -163,6 +163,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         _handleResponse: function(response) {
           this.response = response.detail.response;
           console.log(this.response);
+          for (j = 0; j < this.fields.length; j++) {
+            this.set("fields."+j+".inputBinding", null);
+          }
           this.notificationMessage = "The form '" + this.formData.name + "' has been accepted succesfully.";
           this.$.notification.open();
         }

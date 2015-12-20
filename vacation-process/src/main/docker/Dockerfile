@@ -39,7 +39,7 @@ RUN yum -y install wget
 
 # RUN wget https://repository.jboss.org/nexus/service/local/repositories/central/content/org/kie/server/kie-server/${KIE_SERVER_VERSION}/kie-server-${KIE_SERVER_VERSION}-ee7.war -O $JBOSS_HOME/standalone/deployments/kie-server-archive.war
 
-RUN wget https://repository.jboss.org/nexus/service/local/repositories/snapshots/content/org/kie/server/kie-server/6.4.0-SNAPSHOT/kie-server-6.4.0-20151210.222755-513-ee7.war -O $JBOSS_HOME/standalone/deployments/kie-server-archive.war
+RUN wget https://repository.jboss.org/nexus/service/local/repositories/snapshots/content/org/kie/server/kie-server/6.4.0-SNAPSHOT/kie-server-6.4.0-20151218.224918-540-ee7.war -O $JBOSS_HOME/standalone/deployments/kie-server-archive.war
 
 # Work with unpacked WAR archives in WildFly, so other images can override webapp files (such as persistence.xml,etc)
 RUN unzip -q -d $JBOSS_HOME/standalone/deployments/kie-server.war $JBOSS_HOME/standalone/deployments/kie-server-archive.war && \
@@ -50,6 +50,7 @@ ADD classes/config/web.xml $JBOSS_HOME/standalone/deployments/kie-server.war/WEB
 
 # Deploy KJAR
 RUN yum -y install maven
+RUN mvn dependency:get -DgroupId=com.google.code.gson -DartifactId=gson -Dversion=2.5 -Dpackaging=jar -DrepoUrl=http://repo1.maven.org/maven/ --settings $JBOSS_HOME/bin/settings.xml
 RUN mvn install:install-file -Dfile=/${KJAR} -DlocalRepositoryPath=$JBOSS_HOME/bin/repositories/kie -DgroupId=link.bek.poc -DartifactId=vacation-process -Dpackaging=jar -Dversion=1.0-SNAPSHOT
 
 # Set right permissions for jboss user.

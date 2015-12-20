@@ -17,32 +17,24 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       }
     </style>
     <kie-execution-server
-      id="kieServer"
+      id="getProcess"
       op="[[getProcessUrl]]"
       username="[[user.userId]]"
       password="[[user.password]]"
-      response="{{processList}}">
+      on-response="_setUpData">
     </kie-execution-server>
 
     <kie-execution-server
-      id="kieServer"
-      op="[[getProcessUrl]]"
+      id="getProcessVariables"
+      op="[[getProcessVariablesUrl]]"
       username="[[user.userId]]"
       password="[[user.password]]"
-      response="{{processList}}">
+      on-response="_addVariableData">
     </kie-execution-server>
 
-    <iron-list items="[[processData]]" as="item">
-      <template>
-      <div class="flex vertical layout">
-      <div class="flex horizontal layout">
-        <paper-input type="datetime-local" label="Requested in" value="{{_toDate(item)}}" readonly></paper-input>
-        <paper-input label="Process Instance Id" value="{{item.process-instance-id}}" readonly></paper-input>
-        <paper-input label="Description" value="{{item.variables.description}}" readonly></paper-input>
-      </div>
-    </div>
-      </template>
-    </iron-list>
+		<paper-datatable id="datatable" data="{{processData}}">
+      <content></content>
+		</paper-datatable>
 
   </template>
 
@@ -66,9 +58,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           initiator: {
             type: String
           },
-          columns: {
-            type: Array
-          },
           page: {
             type: Number,
             value: 0
@@ -76,10 +65,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           pageSize: {
             type: Number,
             value: 10
-          },
-          processList: {
-            type: Object,
-            observer: "_setUpData"
           },
           processData: {
             type: Array
@@ -90,30 +75,44 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           this._refresh();
         },
 
-        _toDate: function(processInstance) {
-          console.log(processInstance["start-date"]);
-          return new Date(processInstance["start-date"]).toISOString().slice(0, 16);;
-        },
-
         _refresh: function() {
           this.getProcessUrl = "queries/processes/" + this.processId +"/instances?page=" + this.page + "&pageSize=" + this.pageSize;
           if (this.initiator != null) {
             this.getProcessUrl += "&initiator=" + this.initiator;
           }
-          console.log(this.getProcessUrl);
-          this.$.kieServer.execute();
+          this.$.getProcess.execute();
         },
 
-        _setUpData: function() {
-          if (this.columns == null) {
-            this.processData = this.processList["process-instance"];
-          } else {
-            // TODO filter
+        _setUpData: function(response) {
+          this.processData = response.detail["process-instance"];
+          console.log(this.processData);
+          for (i = 0; i < this.processData.length; i++) {
+            this.getProcessVariablesUrl = "queries/processes/instances/" + this.processData[i]["process-instance-id"] + "/variables/instances";
+            this.$.getProcessVariables.execute();
           }
-          // TODO: request process variables and put them into processData
-          /**for () {
-            this.getProcessVariablesUrl = "queries/processes/instances/" + PROCESS_INST_ID + "/variables/instances";
-          }*/
+        },
+
+        _addVariableData: function(response) {
+          var variables = response.detail["variable-instance"];
+          for (var i = 0; i < variables.length; i++) {
+            var v = variables[i];
+            var j = this._getProcessDataByPID(v["process-instance-id"]);
+            var value = v.value;
+            try {
+              value = JSON.parse(value);
+            } catch(e) {
+              // value is not an object
+            }
+            this.set("processData."+j+"."+v.name, value);
+          }
+        },
+
+        _getProcessDataByPID: function(pid) {
+          for (var j = 0; j < this.processData.length; j++) {
+            if (this.processData[j]["process-instance-id"] == pid) {
+              return j;
+            }
+          }
         }
 
       });

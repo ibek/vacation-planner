@@ -3,3 +3,5 @@
 .settings
 bin
 file-uploads
+.idea
+*.iml
