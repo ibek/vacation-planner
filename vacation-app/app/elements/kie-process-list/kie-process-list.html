@@ -32,14 +32,17 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       on-response="_addVariableData">
     </kie-execution-server>
 
-		<paper-datatable id="datatable" data="{{processData}}">
-      <content></content>
-		</paper-datatable>
+    <paper-datatable-card id="datatableCard" page-size="{{pageSize}}" data-source="{{dataSource}}" id-property="process-instance-id">
+  		<paper-datatable id="datatable">
+        <content></content>
+  		</paper-datatable>
+    </paper-datatable-card>
 
   </template>
 
   <script>
     (function () {
+
       Polymer({
         is: 'kie-process-list',
         properties: {
@@ -58,16 +61,16 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           initiator: {
             type: String
           },
-          page: {
-            type: Number,
-            value: 0
-          },
           pageSize: {
             type: Number,
             value: 10
           },
           processData: {
             type: Array
+          },
+          dataSource: {
+            type: Object,
+            computed: '_setDataSource(processData)',
           }
         },
 
@@ -75,8 +78,20 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           this._refresh();
         },
 
-        _refresh: function() {
-          this.getProcessUrl = "queries/processes/" + this.processId +"/instances?page=" + this.page + "&pageSize=" + this.pageSize;
+        _setDataSource: function(processData) {
+          return {
+            get: function(sort, page, pageSize){
+              return new Promise(function(resolve, reject){
+                resolve(processData.slice((page-1)*pageSize, page*pageSize));
+              });
+            },
+            length:processData.length
+          };
+        },
+
+        _refresh: function(page) {
+          page = page || 0;
+          this.getProcessUrl = "queries/processes/" + this.processId +"/instances?";//page=" + page + "&pageSize=" + this.pageSize;
           if (this.initiator != null) {
             this.getProcessUrl += "&initiator=" + this.initiator;
           }
@@ -105,6 +120,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             }
             this.set("processData."+j+"."+v.name, value);
           }
+          this.$.datatableCard.retrieveVisibleData();
         },
 
         _getProcessDataByPID: function(pid) {

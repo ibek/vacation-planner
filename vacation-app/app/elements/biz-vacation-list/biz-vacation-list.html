@@ -14,7 +14,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     <kie-process-list
       user="{{user}}"
       process-id="vacation-process.RequestVacation"
-      columns="[[columns]]"
       initiator="[[user.userId]]">
       <content></content>
     </kie-process-list>
@@ -26,26 +25,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         is: 'biz-vacation-list',
         properties: {
           user: {
-            type: Object,
-            notify: true,
-            observer: "_configureFilter"
-          },
-          columns: {
-            type: Array,
-            value: null//["Description"]
-          },
-          varFilter: {
-            type: Object,
-            notify: true
+            type: Object
           }
         },
 
         ready: function() {
 
-        },
-
-        _configureFilter: function() {
-          this.varFilter = {"userId": this.user.userId};
         }
 
       });
