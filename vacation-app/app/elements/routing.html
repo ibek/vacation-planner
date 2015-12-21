@@ -42,6 +42,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       routeForLoggedUser('myrequests');
     });
 
+    page('/awaitingrequests', scrollToTop, function() {
+      routeForLoggedUser('awaitingrequests');
+    });
+
     page('/users/:name', scrollToTop, function(data) {
       app.route = 'user-info';
       app.params = data.params;

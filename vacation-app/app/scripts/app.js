@@ -79,6 +79,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     return a == b && this.selectedUser != null;
   };
 
+  app.formatDateTime = function(d) {
+    var datestring = ("0" + d.getDate()).slice(-2) + "-" + ("0"+(d.getMonth()+1)).slice(-2) + "-" +
+    d.getFullYear() + " " + ("0" + d.getHours()).slice(-2) + ":" + ("0" + d.getMinutes()).slice(-2);
+    return datestring;
+  };
+
   app.getSelectedUser = function() {
     console.log(this.selectedUser);
     return this.selectedUser;

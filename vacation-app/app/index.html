@@ -100,7 +100,7 @@
               <span>Team Vacation Calendar</span>
             </a>
 
-            <a data-route="requests" href="/requests" on-click="onDataRouteClick">
+            <a data-route="awaitingrequests" href="/awaitingrequests" on-click="onDataRouteClick">
               <iron-icon icon="hourglass-full"></iron-icon>
               <span>Awaiting Vacation Requests</span>
             </a>
@@ -140,6 +140,7 @@
         <div class="content">
 
             <iron-pages attr-for-selected="data-route" selected="{{route}}">
+
               <section data-route="home">
                 <paper-material elevation="1">
                   <biz-user-list selected-user="{{selectedUser}}"></biz-user-list>
@@ -157,6 +158,7 @@
                   </paper-material>
                 </template>
               </section>
+
               <section data-route="myrequests">
                 <template is="dom-if" if="{{checkRoute(route, 'myrequests')}}">
                   <paper-material elevation="1">
@@ -164,7 +166,7 @@
                     <biz-vacation-list
                       user="{{selectedUser}}">
                       <paper-datatable-column header="Id" property="process-instance-id"></paper-datatable-column>
-                			<paper-datatable-column header="Requested in" type="date" property="start-date"></paper-datatable-column>
+                			<paper-datatable-column header="Requested in" type="date" format-value="{{formatDateTime}}" property="start-date"></paper-datatable-column>
                 			<paper-datatable-column header="Description" type="Object" property="vacation">
                         <template>
                   					<span>{{value.description}}</span>
@@ -181,6 +183,38 @@
                 				</template>
                       </paper-datatable-column>
                     </biz-vacation-list>
+                  </paper-material>
+                </template>
+              </section>
+
+              <section data-route="awaitingrequests">
+                <template is="dom-if" if="{{checkRoute(route, 'awaitingrequests')}}">
+                  <paper-material elevation="1">
+                    <div style="font-size:30px">Awaiting Vacation Requests</div>
+                    <kie-task-list task-name="ApproveVacation" user="{{selectedUser}}">
+                      <paper-datatable-column header="Id" property="task-id"></paper-datatable-column>
+                			<paper-datatable-column header="Applier" property="user" type="Object">
+                        <template>
+                            <span>{{value.name}}</span>
+                        </template>
+                      </paper-datatable-column>
+                			<paper-datatable-column header="Created on" type="date" format-value="{{formatDateTime}}" property="task-created-on"></paper-datatable-column>
+                			<paper-datatable-column header="Description" type="Object" property="vacation">
+                        <template>
+                  					<span>{{value.description}}</span>
+                				</template>
+                      </paper-datatable-column>
+                			<paper-datatable-column header="Duration" type="Object" property="vacation">
+                        <template>
+                  					<span>{{item.vacation.from}} - {{item.vacation.to}}</span>
+                				</template>
+                      </paper-datatable-column>
+                			<paper-datatable-column header="Status" type="Object" property="vacation">
+                        <template>
+                  					<span>{{value.status}}</span>
+                				</template>
+                      </paper-datatable-column>
+                    </kie-task-list>
                   </paper-material>
                 </template>
               </section>

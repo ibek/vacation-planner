@@ -1,6 +1,6 @@
 
 <form id="195121526">
-<property name="name" value="ApproveVacation-taskform.form"/>
+<property name="name" value="Approve Vacation"/>
 <property name="displayMode" value="default"/>
 <property name="status" value="0"/>
 <field position="5" name="approved" type="CheckBox" id="1272570841">

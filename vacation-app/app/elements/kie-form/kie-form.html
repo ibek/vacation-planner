@@ -35,10 +35,13 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     <div class="list-items">
       <template is="dom-repeat" items="{{fields}}" as="field" sort="_sortFields">
         <template is="dom-if" if="{{_isInputText(field)}}">
-          <paper-input label="[[field.label]]" value="{{field.inputBinding}}"></paper-input>
+          <paper-input label="[[field.label]]" value="{{field.inputBinding}}" required="{{field.required}}" readOnly="{{field.readonly}}"></paper-input>
         </template>
         <template is="dom-if" if="{{_isInputDate(field)}}">
-          <paper-input type="date" label="[[field.label]]" value="{{field.inputBinding}}"></paper-input>
+          <paper-input type="date" label="[[field.label]]" value="{{field.inputBinding}}" required="{{field.required}}" readOnly="{{field.readonly}}"></paper-input>
+        </template>
+        <template is="dom-if" if="{{_isCheckBox(field)}}">
+          <paper-checkbox checked="{{field.inputBinding}}" style="margin-top: 5px" required="{{field.required}}" readOnly="{{field.readonly}}">[[field.label]]</paper-checkbox>
         </template>
       </template>
     </div>
@@ -47,7 +50,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       verbose
       id="ajax"
       url="[[url]]"
-      method="POST"
+      method="[[method]]"
       headers="[[headers]]"
       content-type="application/json"
       handle-as="json"
@@ -78,6 +81,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           notificationMessage: {
             type: String
           },
+          method: {
+            type: String,
+            value: "POST"
+          },
           headers: {
             type: Object,
             value: {}
@@ -93,12 +100,22 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
         resetForm: function() {
           this.fields = this.formData.field;
+          console.log(this.fields);
           for (j = 0; j < this.fields.length; j++) {
             var field = this.fields[j];
             if (this._isInputDate(field) && field.inputBinding == null) {
               field.inputBinding = new Date().getTime();
+            } else if (this._isInputDate(field)) {
+              var parts = field.inputBinding.split(" "); // Thu Dec 24 00:00:00 UTC 2015
+              field.inputBinding = parts[5]+"-" + this._getMonth(parts[1]) + "-" + parts[2];
+            } else if (!field.readonly) {
+              field.inputBinding = null;
             }
           }
+        },
+
+        _getMonth: function(m) {
+          return "JanFebMarAprMayJunJulAugSepOctNovDec".indexOf(m) / 3 + 1;
         },
 
         _readData: function() {
@@ -129,17 +146,21 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           return field.type == "InputDate";
         },
 
+        _isCheckBox: function(field) {
+          return field.type == "CheckBox";
+        },
+
         _makePayload: function() {
           var out = {};
           for (i = 0; i < this.fields.length; i++) {
             field = this.fields[i];
-            console.log(i);
             var propName;
             var propSubName;
             var value = field.inputBinding;
             if (this._isInputDate(field)) {
               var parts = value.split('-');
-              value = new Date(parts[0], parts[1]-1, parts[2]).getTime();
+              var d = new Date(parts[0], parts[1]-1, parts[2]);
+              value = new Date(d.getTime() - d.getTimezoneOffset() * 60000).getTime();
             }
             index = field.outputBinding.indexOf("/");
             if (index > -1) {
@@ -150,14 +171,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                   out[propName] = {};
                   out[propName][classType] = {};
               }
-              console.log(propName + " " + classType + " " + propSubName + " = " + value);
               out[propName][classType][propSubName] = value;
             } else {
               propName = field.outputBinding;
               out[propName] = value;
             }
           }
-          console.log(out);
           return out;
         },
 

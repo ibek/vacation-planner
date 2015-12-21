@@ -9,7 +9,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 -->
 <link rel="import" href="../../bower_components/polymer/polymer.html">
 
-<dom-module id="kie-process-list">
+<dom-module id="kie-task-list">
   <template>
     <style>
       :host {
@@ -17,8 +17,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       }
     </style>
     <kie-execution-server
-      id="getProcess"
-      op="[[getProcessUrl]]"
+      id="getTasks"
+      op="[[getTasksUrl]]"
       username="[[user.userId]]"
       password="[[user.password]]"
       on-response="_setUpData">
@@ -35,8 +35,20 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     <paper-datatable-card id="datatableCard" page-size="{{pageSize}}" data-source="{{dataSource}}">
   		<paper-datatable id="datatable">
         <content></content>
+        <paper-datatable-column property="task-id">
+          <template>
+            <paper-icon-button icon="done" on-tap="_completeTask" data-args="{{value}}"></paper-icon-button>
+          </template>
+        </paper-datatable-column>
   		</paper-datatable>
     </paper-datatable-card>
+
+    <kie-complete-task-form
+      user="{{user}}"
+      container="vacation-planner"
+      task-id="{{taskId}}"
+      style="margin-top: 10px">
+    </kie-complete-task-form>
 
   </template>
 
@@ -44,12 +56,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     (function () {
 
       Polymer({
-        is: 'kie-process-list',
+        is: 'kie-task-list',
         properties: {
-          processId: {
+          taskName: {
             type: String
           },
-          getProcessUrl: {
+          getTasksUrl: {
             type: String
           },
           getProcessVariablesUrl: {
@@ -65,12 +77,16 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             type: Number,
             value: 10
           },
-          processData: {
+          taskData: {
             type: Array
+          },
+          taskId: {
+            type: Number,
+            value: -1
           },
           dataSource: {
             type: Object,
-            computed: '_setDataSource(processData)',
+            computed: '_setDataSource(taskData)',
           }
         },
 
@@ -78,31 +94,27 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           this._refresh();
         },
 
-        _setDataSource: function(processData) {
+        _setDataSource: function(taskData) {
           return {
             get: function(sort, page, pageSize){
               return new Promise(function(resolve, reject){
-                resolve(processData.slice((page-1)*pageSize, page*pageSize));
+                resolve(taskData.slice((page-1)*pageSize, page*pageSize));
               });
             },
-            length:processData.length
+            length:taskData.length
           };
         },
 
         _refresh: function(page) {
-          page = page || 0;
-          this.getProcessUrl = "queries/processes/" + this.processId +"/instances?";//page=" + page + "&pageSize=" + this.pageSize;
-          if (this.initiator != null) {
-            this.getProcessUrl += "&initiator=" + this.initiator;
-          }
-          this.$.getProcess.execute();
+          this.getTasksUrl = "queries/tasks/instances/variables/TaskName?varValue=" + this.taskName;
+          this.$.getTasks.execute();
         },
 
         _setUpData: function(response) {
-          this.processData = response.detail["process-instance"];
-          console.log(this.processData);
-          for (i = 0; i < this.processData.length; i++) {
-            this.getProcessVariablesUrl = "queries/processes/instances/" + this.processData[i]["process-instance-id"] + "/variables/instances";
+          this.taskData = response.detail["task-summary"];
+          console.log(this.taskData);
+          for (i = 0; i < this.taskData.length; i++) {
+            this.getProcessVariablesUrl = "queries/processes/instances/" + this.taskData[i]["task-proc-inst-id"] + "/variables/instances";
             this.$.getProcessVariables.execute();
           }
         },
@@ -111,7 +123,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           var variables = response.detail["variable-instance"];
           for (var i = 0; i < variables.length; i++) {
             var v = variables[i];
-            var j = this._getProcessDataByPID(v["process-instance-id"]);
+            var j = this._gettaskDataByPID(v["process-instance-id"]);
             var value = v.value;
             try {
               value = JSON.parse(value);
@@ -119,17 +131,23 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             } catch(e) {
               // value is not an object
             }
-            this.set("processData."+j+"."+v.name, value);
+            this.set("taskData."+j+"."+v.name, value);
           }
           this.$.datatableCard.retrieveVisibleData();
         },
 
-        _getProcessDataByPID: function(pid) {
-          for (var j = 0; j < this.processData.length; j++) {
-            if (this.processData[j]["process-instance-id"] == pid) {
+        _gettaskDataByPID: function(pid) {
+          for (var j = 0; j < this.taskData.length; j++) {
+            if (this.taskData[j]["task-proc-inst-id"] == pid) {
               return j;
             }
           }
+        },
+
+        _completeTask: function(e) {
+          console.log(e);
+          var taskId = e.target.parentElement.dataArgs;
+          this.taskId = taskId;
         }
 
       });
