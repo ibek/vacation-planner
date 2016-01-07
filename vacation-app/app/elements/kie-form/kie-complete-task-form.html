@@ -54,7 +54,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           },
           hidden:{
             type: Boolean,
-            value: true
+            value: false
           }
         },
 
@@ -63,11 +63,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         },
 
         refresh: function() {
-          this.hidden = this.taskId < 0;
-          console.log(this.hidden);
           if (!this.hidden) {
             this.getFormUrl = "containers/" + this.container + "/forms/tasks/" + this.taskId;
-            this.completeTaskUrl = this.serverUrl + "containers/" + this.container + "/tasks/" + this.taskId + "/states/completed";
+            this.completeTaskUrl = this.serverUrl + "containers/" + this.container + "/tasks/" + this.taskId + "/states/completed?force=true";
             this.$.kieServer.execute();
           }
         }

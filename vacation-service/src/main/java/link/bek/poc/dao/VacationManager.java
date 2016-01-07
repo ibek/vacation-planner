@@ -26,6 +26,7 @@ public class VacationManager {
         boolean verified = checkVacation(vacation);
         if (!verified) {
             handler.handle(Future.failedFuture("Vacation object is incorrect: \n" + vacation.encodePrettily()));
+            return;
         }
         mongo.insert(COLLECTION, vacation, handler);
     }
@@ -36,9 +37,29 @@ public class VacationManager {
         mongo.findOne(COLLECTION, query, null, handler);
     }
     
-    public void vacationByEmployee(String employee, Handler<AsyncResult<List<JsonObject>>> handler) {
+    public void vacationByEmployee(String employee, String status, Handler<AsyncResult<List<JsonObject>>> handler) {
         JsonObject query = new JsonObject();
-        query.put("employee", employee);
+        if (status != null) {
+            List<JsonObject> andObjects = new ArrayList<JsonObject>();
+            andObjects.add(new JsonObject().put("employee", employee));
+            andObjects.add(new JsonObject().put("status", status));
+            query.put("$and", new JsonArray(andObjects));
+        } else {
+            query.put("employee", employee);
+        }
+        mongo.find(COLLECTION, query, handler);
+    }
+    
+    public void vacationByManager(String manager, String status, Handler<AsyncResult<List<JsonObject>>> handler) {
+        JsonObject query = new JsonObject();
+        if (status != null) {
+            List<JsonObject> andObjects = new ArrayList<JsonObject>();
+            andObjects.add(new JsonObject().put("manager", manager));
+            andObjects.add(new JsonObject().put("status", status));
+            query.put("$and", new JsonArray(andObjects));
+        } else {
+            query.put("manager", manager);
+        }
         mongo.find(COLLECTION, query, handler);
     }
     
@@ -66,7 +87,7 @@ public class VacationManager {
     }
     
     private boolean checkVacation(JsonObject vacation) {
-        String[] elements = {"employee", "description", "from", "to", "approver", "status"};
+        String[] elements = {"employee", "description", "from", "to", "manager", "status", "requestId"};
         if (vacation.containsKey("_id")) {
             vacation.remove("_id");
         }

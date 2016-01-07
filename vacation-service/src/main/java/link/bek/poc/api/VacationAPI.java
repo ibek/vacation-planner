@@ -51,7 +51,27 @@ public class VacationAPI {
             context.fail(400);
             return;
         }
-        vacationManager.vacationByEmployee(employee, result -> {
+        String status = request.getParam("status");
+        vacationManager.vacationByEmployee(employee, status, result -> {
+            if (result.failed()) {
+                context.fail(result.cause());
+                return;
+            }
+            List<JsonObject> vacations = result.result();
+            JsonArray response = new JsonArray((List)vacations);
+            context.response().end(response.encode());
+        });
+    }
+    
+    public void retrieveByManager(RoutingContext context) {
+        HttpServerRequest request = context.request();
+        String manager = request.getParam("manager");
+        if (manager == null) {
+            context.fail(400);
+            return;
+        }
+        String status = request.getParam("status");
+        vacationManager.vacationByManager(manager, status, result -> {
             if (result.failed()) {
                 context.fail(result.cause());
                 return;

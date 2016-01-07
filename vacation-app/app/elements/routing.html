@@ -34,16 +34,25 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     page('/', scrollToTop, function() {
       app.route = 'home';
     });
-    page('/newvacation', scrollToTop, function() {
-      routeForLoggedUser('newvacation');
+
+    page('/my_vacations', scrollToTop, function() {
+      routeForLoggedUser('my_vacations');
     });
 
-    page('/myrequests', scrollToTop, function() {
-      routeForLoggedUser('myrequests');
+    page('/new_vacation', scrollToTop, function() {
+      routeForLoggedUser('new_vacation');
     });
 
-    page('/awaitingrequests', scrollToTop, function() {
-      routeForLoggedUser('awaitingrequests');
+    page('/my_requests', scrollToTop, function() {
+      routeForLoggedUser('my_requests');
+    });
+
+    page('/team_vacations', scrollToTop, function() {
+      routeForLoggedUser('team_vacations');
+    });
+
+    page('/awaiting_requests', scrollToTop, function() {
+      routeForLoggedUser('awaiting_requests');
     });
 
     page('/users/:name', scrollToTop, function(data) {

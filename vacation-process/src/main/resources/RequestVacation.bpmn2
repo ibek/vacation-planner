@@ -201,7 +201,8 @@ System.out.println(user);]]></drools:script>
         <drools:onEntry-script scriptFormat="http://www.java.com/java">
           <drools:script><![CDATA[String baseUrl = "http://" + System.getProperty("vacation.service.host") + ":" + System.getProperty("vacation.service.port") + "/api/";kcontext.setVariable("requestUrl", baseUrl + "vacations");
 
-vacation.setApprover(user.getManager());
+vacation.setRequestId(kcontext.getProcessInstance().getId());
+vacation.setManager(user.getManager());
 vacation.setStatus("waiting");]]></drools:script>
         </drools:onEntry-script>
       </bpmn2:extensionElements>

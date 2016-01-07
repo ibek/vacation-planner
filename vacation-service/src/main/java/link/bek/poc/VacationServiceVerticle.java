@@ -92,7 +92,8 @@ public class VacationServiceVerticle extends AbstractVerticle {
         router.post("/vacations").handler(vacationAPI::create);
         router.post("/vacations/:vacationId").handler(vacationAPI::updateStatus);
         router.get("/vacations/:vacationId").handler(vacationAPI::retrieveById);
-        router.get("/employees/:employee/vacations").handler(vacationAPI::retrieveByEmployee);
+        router.get("/vacations/by-employee/:employee").handler(vacationAPI::retrieveByEmployee);
+        router.get("/vacations/by-manager/:manager").handler(vacationAPI::retrieveByManager);
         router.get("/vacations").handler(vacationAPI::retrieveByDuration);
 
         return router;
@@ -102,7 +103,7 @@ public class VacationServiceVerticle extends AbstractVerticle {
         JsonObject config = new JsonObject();
         config.put("host", mongoHost);
         config.put("port", mongoPort);
-        config.put("db_name", "vertx-feeds");
+        config.put("db_name", "vacation-planner");
         return config;
     }
     

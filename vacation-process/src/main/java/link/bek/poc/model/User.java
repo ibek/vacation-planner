@@ -28,6 +28,55 @@ public class User implements java.io.Serializable
    {
    }
 
+   @Override
+   public int hashCode() {
+       final int prime = 31;
+       int result = 1;
+       result = prime * result + ((_id == null) ? 0 : _id.hashCode());
+       result = prime * result + ((manager == null) ? 0 : manager.hashCode());
+       result = prime * result + ((name == null) ? 0 : name.hashCode());
+       result = prime * result + ((password == null) ? 0 : password.hashCode());
+       result = prime * result + ((userId == null) ? 0 : userId.hashCode());
+       return result;
+   }
+   
+   @Override
+   public boolean equals(Object obj) {
+       if (this == obj)
+           return true;
+       if (obj == null)
+           return false;
+       if (getClass() != obj.getClass())
+           return false;
+       User other = (User) obj;
+       if (_id == null) {
+           if (other._id != null)
+               return false;
+       } else if (!_id.equals(other._id))
+           return false;
+       if (manager == null) {
+           if (other.manager != null)
+               return false;
+       } else if (!manager.equals(other.manager))
+           return false;
+       if (name == null) {
+           if (other.name != null)
+               return false;
+       } else if (!name.equals(other.name))
+           return false;
+       if (password == null) {
+           if (other.password != null)
+               return false;
+       } else if (!password.equals(other.password))
+           return false;
+       if (userId == null) {
+           if (other.userId != null)
+               return false;
+       } else if (!userId.equals(other.userId))
+           return false;
+       return true;
+   }
+
    public java.lang.String getUserId()
    {
       return this.userId;

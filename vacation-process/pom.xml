@@ -24,6 +24,19 @@
       <artifactId>gson</artifactId>
       <version>2.5</version>
     </dependency>
+    
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>4.12</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.jbpm</groupId>
+      <artifactId>jbpm-test</artifactId>
+      <version>${kie.version}</version>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
   
   <build>

@@ -101,7 +101,7 @@ public class UserServiceVerticle extends AbstractVerticle {
         JsonObject config = new JsonObject();
         config.put("host", mongoHost);
         config.put("port", mongoPort);
-        config.put("db_name", "vertx-feeds");
+        config.put("db_name", "vacation-planner");
         return config;
     }
     

@@ -11,12 +11,33 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
 <dom-module id="biz-vacation-list">
   <template>
-    <kie-process-list
+    <!--<kie-process-list
+      id="vacationList"
       user="{{user}}"
       process-id="vacation-process.RequestVacation"
-      initiator="[[user.userId]]">
+      initiator="[[user.userId]]"
+      status="[[processStatus]]">
       <content></content>
-    </kie-process-list>
+    </kie-process-list>-->
+
+    <biz-vacation-service id="getVacations" op="[[operation]]" on-response="_setUpData"></biz-vacation-service>
+
+    <kie-execution-server
+      id="getProcessWithVariables"
+      op="[[getProcessWithVariablesUrl]]"
+      username="[[user.userId]]"
+      password="[[user.password]]"
+      on-response="_addProcessAndVariableData">
+    </kie-execution-server>
+
+    <paper-datatable-card id="datatableCard" page-size="{{pageSize}}" data-source="{{dataSource}}" id-property="requestId">
+      <div toolbar-main>
+				<paper-icon-button icon="refresh" on-tap="refresh"></paper-icon-button>
+			</div>
+  		<paper-datatable id="datatable">
+        <content></content>
+  		</paper-datatable>
+    </paper-datatable-card>
   </template>
 
   <script>
@@ -26,11 +47,110 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         properties: {
           user: {
             type: Object
+          },
+          status: {
+            type: String // accepted, denied, waiting
+          },
+          team: {
+            type: Boolean,
+            value: false
+          },
+          operation: {
+            type: String, // all, active, completed, aborted
+            computed: '_setOperation(user,team)'
+          },
+          getProcessWithVariablesUrl: {
+            type: String
+          },
+          vacations: {
+            type: Object
+          },
+          pageSize: {
+            type: Number,
+            value: 10
+          },
+          vacationData: {
+            type: Array
+          },
+          dataSource: {
+            type: Object,
+            computed: '_setDataSource(vacationData)',
           }
         },
 
         ready: function() {
+          this.refresh();
+        },
 
+        refresh: function() {
+          this.$.getVacations.execute();
+        },
+
+        _setOperation: function(user,team) {
+          console.log(user + " " + team);
+          var url = "";
+          if (team) {
+            var manager = user.manager;
+            if (manager == null) {
+              manager = user.userId;
+            }
+            url = "vacations/by-manager/" + manager;
+          } else {
+            url = "vacations/by-employee/" + user.userId;
+          }
+          if (this.status == null || this.status == "") {
+            return url;
+          } else {
+            console.log("status = " + this.status);
+            return url + "?status=" + this.status;
+          }
+        },
+
+        _setUpData: function(response) {
+          this.vacationData = response.detail;
+          console.log(this.vacationData);
+          for (i = 0; i < this.vacationData.length; i++) {
+            this.getProcessWithVariablesUrl = "queries/processes/instances/" + this.vacationData[i]["requestId"] + "?withVars=true";
+            this.$.getProcessWithVariables.execute();
+          }
+        },
+
+        _addProcessAndVariableData: function(response) {
+          console.log(response);
+          var processInstance = response.detail;
+          var variables = processInstance["process-instance-variables"];
+          var j = this._getVacationDataByPID(processInstance["process-instance-id"]);
+          this.set("vacationData."+j+".start-date", processInstance["start-date"]);
+          for (var k in variables) {
+            var v = variables[k];
+            try {
+              v = JSON.parse(v);
+              console.log(v);
+            } catch(e) {
+              // value is not an object
+            }
+            this.set("vacationData."+j+"."+k, v);
+          }
+          this.$.datatableCard.retrieveVisibleData();
+        },
+
+        _setDataSource: function(vacationData) {
+          return {
+            get: function(sort, page, pageSize){
+              return new Promise(function(resolve, reject){
+                resolve(vacationData.slice((page-1)*pageSize, page*pageSize));
+              });
+            },
+            length:vacationData.length
+          };
+        },
+
+        _getVacationDataByPID: function(pid) {
+          for (var j = 0; j < this.vacationData.length; j++) {
+            if (this.vacationData[j]["requestId"] == pid) {
+              return j;
+            }
+          }
         }
 
       });

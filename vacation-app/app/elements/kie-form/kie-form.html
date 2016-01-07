@@ -15,24 +15,14 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       :host {
         display: block;
       }
-      #formPost {
-        padding: 10px;
-      }
-      .form {
-        background-color: white;
-        padding: 20px;
-        margin-top: 10px;
-      }
-      .list-items {
+      #form {
         margin: 10px;
       }
-      .list-title {
-        margin-bottom: 10px;
-        font-weight: bold;
-      }
     </style>
+
     <div style="font-size:30px">[[formData.name]]</div>
-    <div class="list-items">
+
+    <div id="form">
       <template is="dom-repeat" items="{{fields}}" as="field" sort="_sortFields">
         <template is="dom-if" if="{{_isInputText(field)}}">
           <paper-input label="[[field.label]]" value="{{field.inputBinding}}" required="{{field.required}}" readOnly="{{field.readonly}}"></paper-input>
@@ -43,9 +33,14 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         <template is="dom-if" if="{{_isCheckBox(field)}}">
           <paper-checkbox checked="{{field.inputBinding}}" style="margin-top: 5px" required="{{field.required}}" readOnly="{{field.readonly}}">[[field.label]]</paper-checkbox>
         </template>
+        <template is="dom-if" if="{{_isSeparator(field)}}">
+          <div style="margin-top: 10px; margin-bottom: 10px; display:block; background-color: lightgrey; height: 10px"></div>
+        </template>
       </template>
     </div>
+
     <paper-button raised on-click="_submitForm">[[buttonName]]</paper-button>
+
     <iron-ajax
       verbose
       id="ajax"
@@ -99,23 +94,38 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         },
 
         resetForm: function() {
-          this.fields = this.formData.field;
+          var data = JSON.parse(JSON.stringify(this.formData.field));
+          this.set("fields", data);
           console.log(this.fields);
-          for (j = 0; j < this.fields.length; j++) {
+          for (var j = 0; j < this.fields.length; j++) {
             var field = this.fields[j];
-            if (this._isInputDate(field) && field.inputBinding == null) {
-              field.inputBinding = new Date().getTime();
-            } else if (this._isInputDate(field)) {
+
+            if (this._isInputDate(field) && field.inputBinding != null) {
               var parts = field.inputBinding.split(" "); // Thu Dec 24 00:00:00 UTC 2015
-              field.inputBinding = parts[5]+"-" + this._getMonth(parts[1]) + "-" + parts[2];
-            } else if (!field.readonly) {
-              field.inputBinding = null;
+              if (parts.length == 6) {
+                this.set("fields."+j+".inputBinding", parts[5]+"-" + this._getMonth(parts[1]) + "-" + parts[2]);
+              }
+            }
+
+            if (field.outputBinding == null) {
+              continue;
+            }
+
+            if (this._isInputDate(field) && field.inputBinding == null) {
+              this.set("fields."+j+".inputBinding", new Date().getTime());
+            } else if (this._isCheckBox(field) && field.inputBinding == null) {
+              this.set("fields."+j+".inputBinding", false);
             }
           }
+
         },
 
         _getMonth: function(m) {
-          return "JanFebMarAprMayJunJulAugSepOctNovDec".indexOf(m) / 3 + 1;
+          var m = "JanFebMarAprMayJunJulAugSepOctNovDec".indexOf(m) / 3 + 1;
+          if (m < 10) {
+            m = "0" + m;
+          }
+          return m;
         },
 
         _readData: function() {
@@ -150,10 +160,17 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           return field.type == "CheckBox";
         },
 
+        _isSeparator: function(field) {
+          return field.type == "Separator";
+        },
+
         _makePayload: function() {
           var out = {};
           for (i = 0; i < this.fields.length; i++) {
             field = this.fields[i];
+            if (field.outputBinding == null) {
+              continue;
+            }
             var propName;
             var propSubName;
             var value = field.inputBinding;
@@ -191,10 +208,19 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
         _handleResponse: function(response) {
           this.response = response.detail.response;
-          console.log(this.response);
           this.resetForm();
           this.notificationMessage = "The form '" + this.formData.name + "' has been accepted succesfully.";
+          this.fire('submitted', {"formName": this.formData.name});
           this.$.notification.open();
+        },
+
+        _clone: function(obj) {
+            if (null == obj || "object" != typeof obj) return obj;
+            var copy = obj.constructor();
+            for (var attr in obj) {
+                if (obj.hasOwnProperty(attr)) copy[attr] = obj[attr];
+            }
+            return copy;
         }
 
       });

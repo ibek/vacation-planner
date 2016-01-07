@@ -33,13 +33,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     </kie-execution-server>
 
     <paper-datatable-card id="datatableCard" page-size="{{pageSize}}" data-source="{{dataSource}}">
-  		<paper-datatable id="datatable">
+      <div toolbar-main>
+				<paper-icon-button icon="refresh" on-tap="refresh"></paper-icon-button>
+			</div>
+  		<paper-datatable id="datatable" selectable selected-item="{{selectedTask}}">
         <content></content>
-        <paper-datatable-column property="task-id">
-          <template>
-            <paper-icon-button icon="done" on-tap="_completeTask" data-args="{{value}}"></paper-icon-button>
-          </template>
-        </paper-datatable-column>
   		</paper-datatable>
     </paper-datatable-card>
 
@@ -47,7 +45,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       user="{{user}}"
       container="vacation-planner"
       task-id="{{taskId}}"
-      style="margin-top: 10px">
+      style="margin-top: 10px"
+      on-submitted="refresh"
+      hidden="{{completeTaskFormHidden}}">
     </kie-complete-task-form>
 
   </template>
@@ -78,20 +78,39 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             value: 10
           },
           taskData: {
-            type: Array
+            type: Array,
+            value: []
           },
           taskId: {
             type: Number,
             value: -1
           },
+          selectedTask: {
+            type: Object,
+            observer: "_selectedTask"
+          },
+          completeTaskFormHidden: {
+            type: Boolean,
+            value: true
+          },
           dataSource: {
             type: Object,
-            computed: '_setDataSource(taskData)',
+            computed: '_setDataSource(taskData)'
           }
         },
 
         ready: function() {
-          this._refresh();
+          this.refresh();
+        },
+
+        refresh: function(e) {
+          console.log(e);
+          this.selectedTask = null;
+          this.taskId = -1;
+          this.taskData = [];
+          this.getTasksUrl = "queries/tasks/instances/variables/TaskName?varValue=" + this.taskName;
+          this.$.getTasks.execute();
+          this.$.datatable.deselectAll();
         },
 
         _setDataSource: function(taskData) {
@@ -103,11 +122,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             },
             length:taskData.length
           };
-        },
-
-        _refresh: function(page) {
-          this.getTasksUrl = "queries/tasks/instances/variables/TaskName?varValue=" + this.taskName;
-          this.$.getTasks.execute();
         },
 
         _setUpData: function(response) {
@@ -144,10 +158,13 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           }
         },
 
-        _completeTask: function(e) {
-          console.log(e);
-          var taskId = e.target.parentElement.dataArgs;
-          this.taskId = taskId;
+        _selectedTask: function() {
+          this.completeTaskFormHidden = this.selectedTask == null;
+          if (this.selectedTask != null) {
+            this.taskId = this.selectedTask["task-id"];
+          } else {
+            this.taskId = -1;
+          }
         }
 
       });

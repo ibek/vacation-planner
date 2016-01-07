@@ -17,10 +17,11 @@ public class Vacation implements java.io.Serializable
    private java.util.Date from;
    @org.kie.api.definition.type.Label("To")
    private java.util.Date to;
+
    @org.kie.api.definition.type.Label("Description")
    private java.lang.String description;
-   @org.kie.api.definition.type.Label("Approver")
-   private java.lang.String approver;
+   @org.kie.api.definition.type.Label("Manager")
+   private java.lang.String manager;
    @org.kie.api.definition.type.Label("Status")
    private java.lang.String status;
 
@@ -29,9 +30,68 @@ public class Vacation implements java.io.Serializable
 
    @org.kie.api.definition.type.Label(value = "Employee Identifier")
    private java.lang.String employee;
+   
+   @org.kie.api.definition.type.Label("Request Identifier")
+   private java.lang.Long requestId;
 
    public Vacation()
    {
+   }
+   
+
+   @Override
+   public int hashCode() {
+       final int prime = 31;
+       int result = 1;
+       result = prime * result + ((_id == null) ? 0 : _id.hashCode());
+       result = prime * result + ((employee == null) ? 0 : employee.hashCode());
+       result = prime * result + ((from == null) ? 0 : from.hashCode());
+       result = prime * result + ((requestId == null) ? 0 : requestId.hashCode());
+       result = prime * result + ((status == null) ? 0 : status.hashCode());
+       result = prime * result + ((to == null) ? 0 : to.hashCode());
+       return result;
+   }
+   
+   @Override
+   public boolean equals(Object obj) {
+       if (this == obj)
+           return true;
+       if (obj == null)
+           return false;
+       if (getClass() != obj.getClass())
+           return false;
+       Vacation other = (Vacation) obj;
+       if (_id == null) {
+           if (other._id != null)
+               return false;
+       } else if (!_id.equals(other._id))
+           return false;
+       if (employee == null) {
+           if (other.employee != null)
+               return false;
+       } else if (!employee.equals(other.employee))
+           return false;
+       if (from == null) {
+           if (other.from != null)
+               return false;
+       } else if (!from.equals(other.from))
+           return false;
+       if (requestId == null) {
+           if (other.requestId != null)
+               return false;
+       } else if (!requestId.equals(other.requestId))
+           return false;
+       if (status == null) {
+           if (other.status != null)
+               return false;
+       } else if (!status.equals(other.status))
+           return false;
+       if (to == null) {
+           if (other.to != null)
+               return false;
+       } else if (!to.equals(other.to))
+           return false;
+       return true;
    }
 
    public java.util.Date getFrom()
@@ -64,14 +124,14 @@ public class Vacation implements java.io.Serializable
       this.description = description;
    }
 
-   public java.lang.String getApprover()
+   public java.lang.String getManager()
    {
-      return this.approver;
+      return this.manager;
    }
 
-   public void setApprover(java.lang.String approver)
+   public void setManager(java.lang.String manager)
    {
-      this.approver = approver;
+      this.manager = manager;
    }
 
    public java.lang.String getStatus()
@@ -104,17 +164,28 @@ public class Vacation implements java.io.Serializable
       this.employee = employee;
    }
 
+   public java.lang.Long getRequestId()
+   {
+      return this.requestId;
+   }
+
+   public void setRequestId(java.lang.Long requestId)
+   {
+      this.requestId = requestId;
+   }
+
    public Vacation(java.util.Date from, java.util.Date to,
-         java.lang.String description, java.lang.String approver,
-         java.lang.String status, java.lang.String _id, java.lang.String employee)
+         java.lang.String description, java.lang.String manager,
+         java.lang.String status, java.lang.String _id, java.lang.String employee, java.lang.Long requestId)
    {
       this.from = from;
       this.to = to;
       this.description = description;
-      this.approver = approver;
+      this.manager = manager;
       this.status = status;
       this._id = _id;
       this.employee = employee;
+      this.requestId = requestId;
    }
    
    @Override
@@ -124,3 +195,4 @@ public class Vacation implements java.io.Serializable
    }
 
 }
+
