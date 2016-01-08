@@ -212,15 +212,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           this.notificationMessage = "The form '" + this.formData.name + "' has been accepted succesfully.";
           this.fire('submitted', {"formName": this.formData.name});
           this.$.notification.open();
-        },
-
-        _clone: function(obj) {
-            if (null == obj || "object" != typeof obj) return obj;
-            var copy = obj.constructor();
-            for (var attr in obj) {
-                if (obj.hasOwnProperty(attr)) copy[attr] = obj[attr];
-            }
-            return copy;
         }
 
       });

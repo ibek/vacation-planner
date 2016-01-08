@@ -11,14 +11,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
 <dom-module id="biz-vacation-list">
   <template>
-    <!--<kie-process-list
-      id="vacationList"
-      user="{{user}}"
-      process-id="vacation-process.RequestVacation"
-      initiator="[[user.userId]]"
-      status="[[processStatus]]">
-      <content></content>
-    </kie-process-list>-->
 
     <biz-vacation-service id="getVacations" op="[[operation]]" on-response="_setUpData"></biz-vacation-service>
 
@@ -36,8 +28,21 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 			</div>
   		<paper-datatable id="datatable">
         <content></content>
+        <paper-datatable-column property="requestId">
+          <template>
+              <paper-icon-button icon="visibility" on-tap="_showProcessImage" data-args="{{value}}"></paper-icon-button>
+          </template>
+        </paper-datatable-column>
   		</paper-datatable>
     </paper-datatable-card>
+
+    <paper-dialog id="processImageDialog" modal>
+      <kie-process-image id="processImage" container="vacation-planner" process-instance-id="{{selectedProcessInstanceId}}" user-id="{{user.userId}}" password="{{user.password}}" on-process-image-change="_updateDialog">
+      </kie-process-image>
+      <div class="buttons">
+        <paper-button dialog-confirm autofocus>Close</paper-button>
+      </div>
+    </paper-dialog>
   </template>
 
   <script>
@@ -64,6 +69,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           },
           vacations: {
             type: Object
+          },
+          selectedProcessInstanceId: {
+            type: Number
           },
           pageSize: {
             type: Number,
@@ -151,6 +159,16 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
               return j;
             }
           }
+        },
+
+        _showProcessImage: function(e) {
+          this.selectedProcessInstanceId = e.target.parentElement.dataArgs;
+          this.$.processImageDialog.open();
+        },
+
+        _updateDialog: function(e) {
+          console.log("updateDialog");
+          this.$.processImageDialog.fit();
         }
 
       });

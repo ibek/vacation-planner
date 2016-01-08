@@ -13,11 +13,9 @@
       id="ajax"
       url="[[url]]"
       method="[[method]]"
-      headers="{{_makeHeaders(username,password)}}"
       body="[[body]]"
       content-type="[[contentType]]"
       params="[[params]]"
-      handle-as="json"
       on-response="_handleResponse"
       on-error="_handleError">
     </iron-ajax>
@@ -65,6 +63,10 @@
             type: String,
             value: "kie-server"
           },
+          acceptType: {
+            type: String,
+            value: "application/json"
+          },
           error: {
             type: Object,
             notify: true
@@ -86,6 +88,7 @@
         },
 
         execute: function() {
+          this._makeHeaders();
           this.$.ajax.generateRequest();
         },
 
@@ -93,12 +96,17 @@
           this.url = this.serverUrl + this.op;
         },
 
-        _makeHeaders: function(user, pass){
+        _makeHeaders: function(){
           var obj = {};
-          obj.Accept = "application/json";
-          obj.Authorization = "Basic " + btoa(user + ":" + pass);
+          obj.Accept = this.acceptType;
+          obj.Authorization = "Basic " + btoa(this.username + ":" + this.password);
           obj["X-Requested-With"] = "XMLHttpRequest";
-          return obj;
+          this.$.ajax.headers = obj;
+          if (this.acceptType.indexOf("json") > -1) {
+            this.$.ajax.handleAs = "json";
+          } else if (this.acceptType.indexOf("xml") > -1) {
+            this.$.ajax.handleAs = "text";
+          }
         },
 
         _handleResponse: function(response) {

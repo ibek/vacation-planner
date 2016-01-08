@@ -1,0 +1,91 @@
+<!--
+@license
+Copyright (c) 2015 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+
+<dom-module id="kie-process-image">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+    </style>
+    <kie-execution-server
+      id="getProcessImage"
+      op="[[getProcessImageUrl]]"
+      accept-type="application/svg+xml"
+      username="[[userId]]"
+      password="[[password]]"
+      on-response="_setProcessImage">
+    </kie-execution-server>
+
+    <div id="svgContainer">
+
+    </div>
+
+  </template>
+
+  <script>
+    (function () {
+
+      Polymer({
+        is: 'kie-process-image',
+        properties: {
+          container: {
+            type: String
+          },
+          processId: {
+            type: String,
+            observer: "refresh"
+          },
+          processInstanceId: {
+            type: Number,
+            observer: "refresh"
+          },
+          getProcessImageUrl: {
+            type: String
+          },
+          userId: {
+            type: String
+          },
+          password: {
+            type: String
+          },
+
+        },
+
+        ready: function() {
+          this.refresh();
+        },
+
+        refresh: function() {
+          console.log(this.processInstanceId);
+          if (this.processId != null) {
+            this.getProcessImageUrl = "containers/" + this.container + "/images/processes/" + this.processId;
+          } else if (this.processInstanceId != null) {
+            this.getProcessImageUrl = "containers/" + this.container + "/images/processes/instances/" + this.processInstanceId;
+          }
+          if (this.getProcessImageUrl != null) {
+            this.$.getProcessImage.execute();
+          }
+        },
+
+        _setProcessImage: function(response) {
+          var data = response.detail;
+          data = data.replace("width=\"3000\"", "width=\"1500\"");
+          data = data.replace("height=\"2000\"", "height=\"600\"");
+          this.$.svgContainer.innerHTML = data;
+          this.fire('process-image-change', null);
+        }
+
+      });
+    })();
+  </script>
+
+</dom-module>
