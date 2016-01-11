@@ -11,12 +11,29 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
 <dom-module id="kie-form">
   <template>
-    <style>
+    <style is="custom-style">
       :host {
         display: block;
       }
       #form {
         margin: 10px;
+      }
+      #divider {
+        margin-top: 10px;
+        margin-bottom: 10px;
+        display:block;
+        background-color: var(--light-primary-color);
+        height: 10px
+      }
+      paper-button.submit {
+        background-color: var(--default-primary-color);
+        --paper-button-raised-keyboard-focus: {
+          background-color: var(--accent-color) !important;
+          color: white !important;
+        };
+      }
+      paper-button.submit:hover {
+        background-color: var(--light-primary-color);
       }
     </style>
 
@@ -34,12 +51,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           <paper-checkbox checked="{{field.inputBinding}}" style="margin-top: 5px" required="{{field.required}}" readOnly="{{field.readonly}}">[[field.label]]</paper-checkbox>
         </template>
         <template is="dom-if" if="{{_isSeparator(field)}}">
-          <div style="margin-top: 10px; margin-bottom: 10px; display:block; background-color: lightgrey; height: 10px"></div>
+          <div id="divider"></div>
         </template>
       </template>
     </div>
 
-    <paper-button raised on-click="_submitForm">[[buttonName]]</paper-button>
+    <paper-button raised on-click="_submitForm" class="submit">[[buttonName]]</paper-button>
 
     <iron-ajax
       verbose
