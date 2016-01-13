@@ -38,7 +38,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
     <paper-dialog id="processImageDialog" modal>
       <paper-dialog-scrollable>
-        <kie-process-image id="processImage" container="vacation-planner" process-instance-id="{{selectedProcessInstanceId}}" user-id="{{user.userId}}" password="{{user.password}}" on-process-image-change="_updateDialog">
+        <kie-process-image id="processImage"
+          container="vacation-planner"
+          process-instance-id="{{selectedProcessInstanceId}}"
+          user-id="{{user.userId}}"
+          password="{{user.password}}" 
+          on-process-image-change="_updateDialog">
         </kie-process-image>
       </paper-dialog-scrollable>
       <div class="buttons">
