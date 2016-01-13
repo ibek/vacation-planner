@@ -43,13 +43,13 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     <div id="form">
       <template is="dom-repeat" items="{{fields}}" as="field" sort="_sortFields">
         <template is="dom-if" if="{{_isInputText(field)}}">
-          <paper-input label="[[field.label]]" value="{{field.inputBinding}}" required="{{field.required}}" readOnly="{{field.readonly}}"></paper-input>
+          <paper-input auto-validate label="[[field.label]]" value="{{field.inputBinding}}" required="{{field.fieldRequired}}" readonly="{{field.readonly}}"></paper-input>
         </template>
         <template is="dom-if" if="{{_isInputDate(field)}}">
-          <paper-input type="date" label="[[field.label]]" value="{{field.inputBinding}}" required="{{field.required}}" readOnly="{{field.readonly}}"></paper-input>
+          <paper-input auto-validate type="date" label="[[field.label]]" value="{{field.inputBinding}}" required="{{field.fieldRequired}}" readonly="{{field.readonly}}"></paper-input>
         </template>
         <template is="dom-if" if="{{_isCheckBox(field)}}">
-          <paper-checkbox checked="{{field.inputBinding}}" style="margin-top: 5px" required="{{field.required}}" readOnly="{{field.readonly}}">[[field.label]]</paper-checkbox>
+          <paper-checkbox checked="{{field.inputBinding}}" style="margin-top: 5px" required="{{field.fieldRequired}}" readonly="{{field.readonly}}">[[field.label]]</paper-checkbox>
         </template>
         <template is="dom-if" if="{{_isSeparator(field)}}">
           <div id="divider"></div>
@@ -151,6 +151,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         },
 
         _submitForm: function () {
+          var valid = this._validateForm();
+          if (!valid) {
+            return; // autovalidation shows users what's wrong
+          }
           this.$.ajax.body = this._makePayload();
           this.headers.Accept = "application/json";
           if (this.user != null) {
@@ -182,16 +186,34 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           return field.type == "Separator";
         },
 
+        _validateForm: function() {
+          for (var i = 0; i < this.fields.length; i++) {
+            field = this.fields[i];
+            if (field.fieldRequired) {
+              if (field.inputBinding == null) {
+                return false;
+              }
+              if (this._isInputDate(field) && this._isNumeric(field.inputBinding)) {
+                return false;
+              }
+            }
+          }
+          return true;
+        },
+
         _makePayload: function() {
           var out = {};
-          for (i = 0; i < this.fields.length; i++) {
+          for (var i = 0; i < this.fields.length; i++) {
             field = this.fields[i];
             if (field.outputBinding == null) {
               continue;
+            } else if (field.inputBinding == null) {
+              console.log("jo");
             }
             var propName;
             var propSubName;
             var value = field.inputBinding;
+            console.log(value);
             if (this._isInputDate(field)) {
               var parts = value.split('-');
               var d = new Date(parts[0], parts[1]-1, parts[2]);
@@ -222,6 +244,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
               return dataHolder;
             }
           }
+        },
+
+        _isNumeric: function(input) {
+          return (input - 0) == input && (''+input).trim().length > 0;
         },
 
         _handleResponse: function(response) {
