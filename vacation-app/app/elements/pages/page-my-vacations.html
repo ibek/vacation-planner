@@ -1,0 +1,67 @@
+<!--
+@license
+Copyright (c) 2015 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+
+<dom-module id="page-my-vacations">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+    </style>
+    <template is="dom-if" if="{{checkRoute(route, 'my_vacations')}}">
+      <div style="font-size:30px">My Planned Vacations</div>
+      <biz-vacation-list
+        user="{{selectedUser}}"
+        status="approved">
+        <paper-datatable-column header="Id" property="requestId"></paper-datatable-column>
+        <paper-datatable-column header="Requested in" type="date" format-value="{{formatDateTime}}" property="start-date"></paper-datatable-column>
+        <paper-datatable-column header="Description" type="Object" property="vacation">
+          <template>
+              <span>{{value.description}}</span>
+          </template>
+        </paper-datatable-column>
+        <paper-datatable-column header="Duration" type="Object" property="vacation">
+          <template>
+              <span>{{item.vacation.from}} - {{item.vacation.to}}</span>
+          </template>
+        </paper-datatable-column>
+        <paper-datatable-column header="Status" property="status">
+        </paper-datatable-column>
+      </biz-vacation-list>
+    </template>
+  </template>
+
+  <script>
+    (function () {
+      Polymer({
+        is: 'page-my-vacations',
+        properties: {
+          route: {
+            type: String
+          },
+          selectedUser: {
+            type: Object
+          }
+        },
+
+        ready: function() {
+
+        },
+
+        checkRoute: function(a, b) {
+          return a == b && this.selectedUser != null;
+        }
+
+      });
+    })();
+  </script>
+
+</dom-module>

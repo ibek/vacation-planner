@@ -37,6 +37,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         @apply(--layout-flex);
         @apply(--layout-horizontal);
         padding: 0 16px;
+        width: 100%;
       }
       .noSelection {
         color: #999;
@@ -51,8 +52,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           <div>
             <div class$="[[_computedClass(selected)]]">
               <div class="pad">
-                  <span>[[index]] [[user.name]] - [[_userRole(user.manager)]]</span>
+                  <span>[[user.name]]</span>
               </div>
+              <span style="float: right">[[_userRole(user.manager)]]</span>
             </div>
             <div class="border"></div>
           </div>
