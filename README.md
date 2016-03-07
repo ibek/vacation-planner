@@ -7,18 +7,39 @@ DevConf 2016 - [Assemble Business Applications with BPM Back-end](https://devcon
 
 ### Requirements
 
-* docker, npm, bower
-* customized BPM KIE Server (https://github.com/ibek/droolsjbpm-integration) --- PRs in progress [Query Process With Vars](https://issues.jboss.org/browse/DROOLS-1020) and Force complete task operation
+* docker, npm, bower, mvn
 
 ### Execution steps
 
-* start database
-* start usermgmt-service
-* start vacation-service
-* start vacation-process
-* start vacation-app/app using "python3 -m http.server"
-* add users using usermgmt-service via REST
-* open http://localhost:8000/
+1. [27017] start database/run.sh
+2. [8182] build & start usermgmt-service
+
+```bash
+mvn clean package
+./usermgmt-service/run.sh
+```
+
+3. [8181] build & start vacation-service/run.sh
+4. [8081] build & start vacation-process/run.sh
+5. [8080] start vacation-app/app
+
+```bash
+python3 -m http.server
+```
+
+6. add users using usermgmt-service via REST
+
+```json
+POST: http://localhost:8182/api/users
+{
+ "userId":"ehorton",
+ "name":"Ernest Horton",
+ "manager":"smurray",
+ "password":"ehorton123;"
+}
+```
+
+7. open http://localhost:8000/
 
 ### Polymer Elements
 
@@ -53,7 +74,7 @@ DevConf 2016 - [Assemble Business Applications with BPM Back-end](https://devcon
 </kie-process-image>
 ```
 
-### Business Managament Process - Request Vacation
+### Managament Process - Request Vacation
 
 ![alt text](https://raw.githubusercontent.com/ibek/vacation-planner/master/docs/screenshots/Request%20Vacation%20Process.png "Request Vacation Process")
 

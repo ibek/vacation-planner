@@ -39,11 +39,9 @@ RUN yum -y install wget
 
 # RUN wget https://repository.jboss.org/nexus/service/local/repositories/central/content/org/kie/server/kie-server/${KIE_SERVER_VERSION}/kie-server-${KIE_SERVER_VERSION}-ee7.war -O $JBOSS_HOME/standalone/deployments/kie-server-archive.war
 
-# RUN wget https://repository.jboss.org/nexus/service/local/repositories/snapshots/content/org/kie/server/kie-server/6.4.0-SNAPSHOT/kie-server-6.4.0-20151218.224918-540-ee7.war -O $JBOSS_HOME/standalone/deployments/kie-server-archive.war
+RUN wget https://repository.jboss.org/nexus/service/local/repositories/snapshots/content/org/kie/server/kie-server/6.4.0-SNAPSHOT/kie-server-6.4.0-20160305.020752-701-ee7.war -O $JBOSS_HOME/standalone/deployments/kie-server-archive.war
 
-# RUN wget https://repository.jboss.org/nexus/service/local/repositories/snapshots/content/org/kie/server/kie-server/6.4.0-SNAPSHOT/kie-server-6.4.0-20160105.145601-560-ee7.war -O $JBOSS_HOME/standalone/deployments/kie-server-archive.war
-
-ADD kie-server-6.4.0-SNAPSHOT-ee7.war $JBOSS_HOME/standalone/deployments/kie-server-archive.war
+# ADD kie-server-6.4.0-SNAPSHOT-ee7.war $JBOSS_HOME/standalone/deployments/kie-server-archive.war
 
 # Work with unpacked WAR archives in WildFly, so other images can override webapp files (such as persistence.xml,etc)
 RUN unzip -q -d $JBOSS_HOME/standalone/deployments/kie-server.war $JBOSS_HOME/standalone/deployments/kie-server-archive.war && \
@@ -55,9 +53,11 @@ ADD classes/config/web.xml $JBOSS_HOME/standalone/deployments/kie-server.war/WEB
 # Deploy KJAR
 RUN yum -y install maven
 
-#RUN mvn dependency:get -DgroupId=com.google.code.gson -DartifactId=gson -Dversion=2.5 -Dpackaging=jar -DrepoUrl=http://repo1.maven.org/maven/ --settings $JBOSS_HOME/bin/settings.xml
+RUN mvn dependency:get -DgroupId=com.google.code.gson -DartifactId=gson -Dversion=2.5 -Dpackaging=jar -DrepoUrl=http://repo1.maven.org/maven/ --settings $JBOSS_HOME/bin/settings.xml
 
 RUN mvn install:install-file -Dfile=/${KJAR} -DlocalRepositoryPath=$JBOSS_HOME/bin/repositories/kie -DgroupId=link.bek.poc -DartifactId=vacation-process -Dpackaging=jar -Dversion=1.0-SNAPSHOT
+
+RUN cp $JBOSS_HOME/bin/repositories/kie/com/google/code/gson/gson/2.5/gson-2.5.jar $JBOSS_HOME/standalone/deployments/kie-server.war/WEB-INF/lib/
 
 # Set right permissions for jboss user.
 RUN chown -R jboss:jboss $JBOSS_HOME/standalone/deployments/* && \
