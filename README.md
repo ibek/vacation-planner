@@ -11,23 +11,23 @@ DevConf 2016 - [Assemble Business Applications with BPM Back-end](https://devcon
 
 ### Execution steps
 
-1. [27017] start database/run.sh
-2. [8182] build & start usermgmt-service
+* 1) [27017] start database/run.sh
+* 2) [8182] build & start usermgmt-service
 
 ```bash
 mvn clean package
 ./usermgmt-service/run.sh
 ```
 
-3. [8181] build & start vacation-service/run.sh
-4. [8081] build & start vacation-process/run.sh
-5. [8080] start vacation-app/app
+* 3) [8181] build & start vacation-service/run.sh
+* 4) [8081] build & start vacation-process/run.sh
+* 5) [8080] start vacation-app/app
 
 ```bash
 python3 -m http.server
 ```
 
-6. add users using usermgmt-service via REST
+* 6) add users using usermgmt-service via REST
 
 ```json
 POST: http://localhost:8182/api/users
@@ -39,7 +39,7 @@ POST: http://localhost:8182/api/users
 }
 ```
 
-7. open http://localhost:8000/
+* 7) open http://localhost:8000/
 
 ### Polymer Elements
 
